@@ -1,0 +1,71 @@
+---
+import { ArrowRight } from 'lucide-react';
+---
+
+<section class="py-16 lg:py-24 bg-gradient-to-br from-slate-50 to-white">
+  <div class="container mx-auto px-4 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      
+      <!-- Left Side: Content -->
+      <div class="space-y-6">
+        <h2 class="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900">
+          Подпишитесь на рассылку 🎉
+        </h2>
+        
+        <p class="text-lg text-slate-600 leading-relaxed">
+          Читайте и делитесь новыми идеями на любые темы.<br />
+          Присоединяйтесь к нам!
+        </p>
+        
+        <!-- Benefits List -->
+        <div class="space-y-3">
+          <div class="flex items-start gap-3">
+            <span class="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">
+              01
+            </span>
+            <p class="text-slate-700 font-medium">Получайте больше скидок</p>
+          </div>
+          
+          <div class="flex items-start gap-3">
+            <span class="flex-shrink-0 w-6 h-6 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-sm font-bold">
+              02
+            </span>
+            <p class="text-slate-700 font-medium">Доступ к премиум материалам</p>
+          </div>
+        </div>
+        
+        <!-- Email Form -->
+        <form class="flex gap-2 max-w-md mt-8">
+          <div class="flex-1 relative">
+            <input 
+              type="email" 
+              placeholder="Введите ваш email"
+              class="w-full px-5 py-3.5 rounded-full border-2 border-slate-200 focus:border-blue-500 focus:outline-none transition-colors text-slate-900 placeholder:text-slate-400"
+              required
+            />
+          </div>
+          <button 
+            type="submit"
+            class="flex-shrink-0 w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-blue-600 transition-all duration-300 hover:scale-105 shadow-lg"
+            aria-label="Подписаться"
+          >
+            <ArrowRight className="w-5 h-5" />
+          </button>
+        </form>
+      </div>
+      
+      <!-- Right Side: Illustration -->
+      <div class="relative flex items-center justify-center lg:justify-end">
+        <div class="relative w-full max-w-3xl">
+          <img 
+            src="/images/newsletter-illustration.png" 
+            alt="Newsletter illustration"
+            class="w-full h-auto scale-125"
+            loading="lazy"
+          />
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</section>

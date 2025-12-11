@@ -1,0 +1,173 @@
+---
+import type { Post } from '../consts';
+import CardInitial from './CardFeatured.astro'; // Converting Featured to be more reusable if needed, or just using it
+import CardStandard from './CardStandard';
+import CategoryBadge from './CategoryBadge.astro';
+import { Heart, MessageCircle, Bookmark } from 'lucide-react';
+
+interface Props {
+  posts: Post[];
+  title?: string;
+  viewAllHref?: string;
+}
+
+const { posts, title, viewAllHref } = Astro.props;
+const mainPost = posts[0];
+const subPosts = posts.slice(1, 5);
+---
+
+<div class="space-y-8">
+  {title && (
+    <div class="flex items-center justify-between border-b border-slate-200 pb-4 dark:border-neutral-800">
+      <h2 class="text-3xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-3">
+        <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+        {title}
+      </h2>
+      {viewAllHref && (
+        <a href={viewAllHref} class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
+          Смотреть все
+        </a>
+      )}
+    </div>
+  )}
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    {/* Main Left Column */}
+    <div class="lg:col-span-2 group cursor-pointer">
+      <div class="relative rounded-3xl overflow-hidden aspect-[4/3] mb-4">
+        <img 
+          src={mainPost.coverImage} 
+          alt={mainPost.title} 
+          class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <div class="absolute top-4 left-4">
+          <CategoryBadge name={mainPost.category.name} color={mainPost.category.color} className="shadow-lg backdrop-blur-sm bg-white/90" />
+        </div>
+      </div>
+      
+      <div class="mt-5 flex flex-col sm:px-4">
+        <div class="space-y-3">
+          <div class="flex flex-wrap items-center text-xs/6 relative text-sm">
+             <div class="relative flex items-center gap-x-2.5">
+               <img src={mainPost.author.avatar} alt={mainPost.author.name} class="size-8 rounded-full object-cover bg-neutral-200" />
+               <span class="block font-semibold text-neutral-900 dark:text-neutral-300">{mainPost.author.name}</span>
+             </div>
+             <span class="mx-1.5 font-medium text-neutral-500 dark:text-neutral-400">·</span>
+             <span class="font-normal text-neutral-500 dark:text-neutral-400">{mainPost.date}</span>
+          </div>
+          
+          <h2 class="block font-semibold text-neutral-900 dark:text-neutral-100 text-base sm:text-lg md:text-xl">
+            <a href={`/blog/${mainPost.slug}`} class="line-clamp-2" title={mainPost.title}>
+              {mainPost.title}
+            </a>
+          </h2>
+          
+          <p class="block text-sm/6 text-neutral-600 dark:text-neutral-400 line-clamp-2">
+            {mainPost.excerpt}
+          </p>
+        </div>
+        
+        <hr role="presentation" class="my-5 w-full border-t border-neutral-950/10 dark:border-white/10" />
+        
+        <div class="relative flex flex-col gap-2 mt-5">
+           <div class="flex flex-wrap gap-x-2 gap-y-1">
+              {/* Like Btn */}
+              <button class="group flex h-8 items-center rounded-full ps-2 pe-3 text-xs leading-none transition-colors bg-rose-50 text-rose-600 dark:bg-rose-100" title="Like">
+                 <Heart className="size-5 fill-current" />
+                 <span class="ms-1 text-rose-600">4.1k</span>
+              </button>
+              
+              {/* Comment Btn */}
+              <button class="flex h-8 min-w-16 items-center rounded-full bg-neutral-50 ps-2 pe-3 text-xs transition-colors hover:bg-teal-50 hover:text-teal-600 dark:bg-white/10 dark:hover:bg-white/10 dark:hover:text-teal-500" title="Comments">
+                 <MessageCircle className="w-[18px] h-[18px] mr-2" />
+                 <span class="">78</span>
+              </button>
+           </div>
+           
+           <div class="flex items-center gap-x-2 text-xs ms-auto">
+              <span>{mainPost.readTime}</span>
+              <button class="relative flex size-8 items-center justify-center rounded-full bg-neutral-50 transition-colors duration-300 hover:bg-neutral-100 dark:bg-white/10 dark:hover:bg-white/20" title="Save to reading list">
+                 <Bookmark className="w-[18px] h/[18px]" />
+              </button>
+           </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Right Sidebar List - Ncmaz Post Card 6 Style */}
+    <div class="lg:col-span-2 h-full grid grid-rows-3 gap-3 lg:gap-4">
+      {subPosts.map((post) => (
+        <div class="group relative flex flex-wrap gap-3 rounded-3xl border border-neutral-200 bg-white p-4 sm:flex-nowrap dark:border-neutral-700 dark:bg-neutral-900 hover:shadow-lg transition-shadow duration-300 h-full">
+           
+           {/* Content (Left - Grow) */}
+           <div class="flex grow flex-col">
+             <div class="space-y-1.5">
+                 {/* Category */}
+                  <div class="flex flex-wrap gap-x-2 gap-y-1">
+                    <span class={`inline-flex items-center gap-x-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${post.category.color.replace('text-', 'text-').replace('bg-', 'bg-')}`}>
+                        {post.category.name}
+                    </span>
+                 </div>
+                 
+                 {/* Title */}
+                 <h2 class="block max-w-sm text-sm font-semibold sm:text-base leading-snug">
+                   <a href={`/blog/${post.slug}`} class="line-clamp-2 text-neutral-900 dark:text-neutral-100 hover:text-blue-600 transition-colors">
+                     {post.title}
+                   </a>
+                 </h2>
+
+                 {/* Excerpt */}
+                 <p class="excerpt-clamp-2 text-xs text-neutral-500 dark:text-neutral-400 mt-2">
+                   {post.excerpt}
+                 </p>
+
+                 {/* Meta: Author - Date */}
+                 <div class="flex flex-wrap items-center text-xs text-neutral-500 dark:text-neutral-400">
+                    <div class="relative flex items-center gap-x-2.5">
+                       <img src={post.author.avatar} alt={post.author.name} class="w-7 h-7 rounded-full object-cover bg-neutral-200" />
+                       <span class="block font-semibold text-neutral-900 dark:text-neutral-300">
+                         {post.author.name}
+                       </span>
+                    </div>
+                    <span class="mx-1.5 font-medium">·</span>
+                    <span class="font-normal">{post.date}</span>
+                 </div>
+             </div>
+
+             {/* Footer Actions */}
+             <div class="relative mt-3 flex flex-col gap-2">
+                <div class="flex items-center gap-x-2 text-xs text-neutral-500">
+                   <span>{post.readTime}</span>
+                   <button class="flex w-8 h-8 items-center justify-center rounded-full bg-neutral-50 hover:bg-neutral-100 dark:bg-white/10 dark:hover:bg-white/20 transition-colors">
+                      <Bookmark className="w-4 h-4" />
+                   </button>
+                </div>
+             </div>
+           </div>
+
+           {/* Image (Right) - Square and Larger */}
+           <a href={`/blog/${post.slug}`} class="relative block w-52 h-52 sm:w-56 sm:h-56 shrink-0">
+              <img 
+                src={post.coverImage} 
+                alt={post.title} 
+                class="w-full h-full rounded-2xl object-cover brightness-100 transition-[filter] duration-300 group-hover:brightness-90"
+              />
+           </a>
+
+        </div>
+      ))}
+    </div>
+
+
+  </div>
+</div>
+
+<style is:global>
+  .excerpt-clamp-2 {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+</style>

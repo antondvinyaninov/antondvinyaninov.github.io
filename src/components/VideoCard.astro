@@ -1,0 +1,110 @@
+---
+import type { Post } from '../consts';
+import CategoryBadge from './CategoryBadge.astro';
+import { Heart, MessageCircle, Bookmark, Play } from 'lucide-react';
+
+interface Props {
+  post: Post;
+  className?: string;
+}
+
+const { 
+  post, 
+  className = '' 
+} = Astro.props;
+
+// Fallback values for missing data
+const {
+  coverImage = '/images/placeholder.png',
+  author = { name: 'Anonymous', avatar: '/images/default-avatar.png' },
+  readTime = '0 min read',
+  category = { id: 'general', name: 'General', color: 'bg-gray-100 text-gray-800' },
+  likes = 0,
+  comments = 0
+} = post;
+---
+
+<article class={`group relative overflow-hidden rounded-3xl aspect-video cursor-pointer ${className}`}>
+  <!-- Background Image -->
+  <a href={`/blog/${post.slug}`} class="block w-full h-full">
+    <img 
+      src={coverImage} 
+      alt={post.title} 
+      class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+      loading="lazy"
+    />
+  </a>
+
+  <!-- Gradient Overlay -->
+  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+
+  <!-- Top Bar: Likes, Comments, Bookmark -->
+  <div class="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
+    <div class="flex items-center gap-2">
+      <!-- Likes -->
+      <button 
+        class="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-sm text-slate-900 transition-all duration-300 hover:bg-white cursor-pointer"
+        aria-label="Like video"
+      >
+        <Heart className="w-4 h-4 fill-current text-rose-500" />
+        <span class="text-xs font-medium">{likes >= 1000 ? `${(likes / 1000).toFixed(1)}k` : likes}</span>
+      </button>
+      
+      <!-- Comments -->
+      <button 
+        class="flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-sm text-slate-900 transition-all duration-300 hover:bg-white cursor-pointer"
+        aria-label="View comments"
+      >
+        <MessageCircle className="w-4 h-4" />
+        <span class="text-xs font-medium">{comments}</span>
+      </button>
+    </div>
+
+    <!-- Bookmark -->
+    <button 
+      class="p-2 rounded-full bg-white/90 backdrop-blur-sm transition-all duration-300 hover:bg-white cursor-pointer"
+      aria-label="Bookmark video"
+    >
+      <Bookmark className="w-4 h-4 text-slate-900" />
+    </button>
+  </div>
+
+  <!-- Play Button Center -->
+  <div class="absolute inset-0 flex items-center justify-center z-10">
+    <button 
+      class="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-2xl transition-all duration-300 group-hover:scale-110 cursor-pointer"
+      aria-label="Play video"
+    >
+      <Play className="w-7 h-7 fill-current text-blue-600 ml-1" />
+    </button>
+  </div>
+
+  <!-- Bottom Content -->
+  <div class="absolute bottom-0 left-0 right-0 p-5 z-10">
+    <!-- Category Badge -->
+    <div class="mb-3">
+      <CategoryBadge 
+        name={category.name} 
+        color={category.color}
+        href={`/blog?category=${category.id}`}
+        className="text-xs"
+      />
+    </div>
+
+    <!-- Title -->
+    <h3 class="text-white font-bold text-lg leading-snug mb-2 line-clamp-2 transition-colors duration-300 group-hover:text-blue-300">
+      <a href={`/blog/${post.slug}`}>
+        {post.title}
+      </a>
+    </h3>
+
+    <!-- Date & Read Time -->
+    <div class="flex items-center gap-2 text-white/90 text-sm">
+      <time class="text-white/80">
+        {post.date}
+      </time>
+      <span class="w-1 h-1 rounded-full bg-white/50"></span>
+      <span class="text-white/80">{readTime}</span>
+    </div>
+  </div>
+</article>

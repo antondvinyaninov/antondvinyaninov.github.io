@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('blog');
+const sortedPosts = allPosts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<BaseLayout title="Blog | AstroBlog">
+  <section class="section container">
+    <div class="page-header">
+      <h1 class="page-title">All Articles</h1>
+      <p class="page-description">
+        Thoughts, tutorials, and insights on the world of web development.
+      </p>
+    </div>
+    
+    <div class="posts-grid">
+      {sortedPosts.map(post => (
+        <PostCard post={post} />
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto var(--space-12);
+  }
+
+  .page-title {
+    font-size: 3rem;
+    margin-bottom: var(--space-4);
+  }
+
+  .page-description {
+    font-size: 1.25rem;
+    color: var(--color-text-muted);
+  }
+
+  .posts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+  }
+
+  @media (min-width: 768px) {
+    .posts-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .posts-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

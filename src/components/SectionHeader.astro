@@ -1,0 +1,24 @@
+---
+import { ArrowRight } from 'lucide-react';
+
+interface Props {
+  title: string;
+  href?: string;
+  className?: string;
+}
+
+const { title, href, className = '' } = Astro.props;
+---
+
+<div class={`flex items-center justify-between mb-8 ${className}`}>
+  <h2 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
+    {title}
+  </h2>
+  
+  {href && (
+    <a href={href} class="group flex items-center gap-1 text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors">
+      Смотреть все 
+      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+    </a>
+  )}
+</div>

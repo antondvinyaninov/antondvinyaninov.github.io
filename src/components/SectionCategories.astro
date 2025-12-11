@@ -1,0 +1,37 @@
+---
+const CATEGORIES = [
+  { name: 'Discover', color: 'bg-slate-900 text-white' },
+  { name: 'Beauty', color: 'bg-pink-50 text-pink-700 hover:bg-pink-100' },
+  { name: 'Sport', color: 'bg-orange-50 text-orange-700 hover:bg-orange-100' },
+  { name: 'Fashion', color: 'bg-blue-50 text-blue-700 hover:bg-blue-100' },
+  { name: 'Tech', color: 'bg-indigo-50 text-indigo-700 hover:bg-indigo-100' },
+  { name: 'Travel', color: 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' },
+  { name: 'Automotive', color: 'bg-red-50 text-red-700 hover:bg-red-100' },
+  { name: 'Food', color: 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100' },
+];
+---
+
+<div class="w-full border-b border-slate-100 mb-8 sm:mb-12">
+  <div class="container mx-auto px-4 lg:px-8 py-4">
+    <div class="flex items-center gap-4 overflow-x-auto pb-2 scrollbar-hide">
+      {CATEGORIES.map(cat => (
+        <a 
+          href="#" 
+          class={`px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${cat.color}`}
+        >
+          {cat.name}
+        </a>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>

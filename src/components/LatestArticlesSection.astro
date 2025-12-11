@@ -1,0 +1,67 @@
+---
+import type { Post } from '../consts';
+import FeaturedArticleCard from './FeaturedArticleCard.astro';
+import CompactArticleCard from './CompactArticleCard.astro';
+
+interface Props {
+  posts: Post[];
+  title?: string;
+  viewAllHref?: string;
+}
+
+const { 
+  posts = [], 
+  title = 'Последние статьи', 
+  viewAllHref = '/blog' 
+} = Astro.props;
+
+// Handle edge cases: split posts into featured (first) and compact (remaining 3)
+const featuredPost = posts[0];
+const compactPosts = posts.slice(1, 4);
+
+// Check if we have enough posts to render
+const hasContent = posts.length > 0;
+---
+
+{hasContent ? (
+  <div>
+    <!-- Section Header -->
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">
+        {title}
+      </h2>
+      {viewAllHref && (
+        <a 
+          href={viewAllHref} 
+          class="text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+        >
+          Смотреть все
+        </a>
+      )}
+    </div>
+
+    <!-- Two-Column Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
+      <!-- Left Column: Featured Article (spans 2 columns on desktop) -->
+      {featuredPost && (
+        <div class="lg:col-span-2">
+          <FeaturedArticleCard post={featuredPost} />
+        </div>
+      )}
+
+      <!-- Right Column: Compact Articles (spans 2 columns on desktop, stacked vertically) -->
+      {compactPosts.length > 0 && (
+        <div class="lg:col-span-2 flex flex-col gap-4 lg:gap-4">
+          {compactPosts.map((post) => (
+            <CompactArticleCard post={post} />
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+) : (
+  <!-- Empty State -->
+  <div class="text-center py-12">
+    <p class="text-slate-500">Нет доступных статей</p>
+  </div>
+)}

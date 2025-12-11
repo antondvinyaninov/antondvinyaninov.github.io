@@ -1,0 +1,108 @@
+---
+import type { Post } from '../consts';
+import CategoryBadge from './CategoryBadge.astro';
+import { Heart, MessageCircle, Clock, Bookmark } from 'lucide-react';
+
+interface Props {
+  post: Post;
+  className?: string;
+}
+
+const { 
+  post, 
+  className = '' 
+} = Astro.props;
+
+// Fallback values for missing data
+const {
+  coverImage = '/images/placeholder.png',
+  excerpt = '',
+  author = { name: 'Anonymous', avatar: '/images/default-avatar.png' },
+  readTime = '0 min read',
+  category = { id: 'general', name: 'General', color: 'bg-gray-100 text-gray-800' },
+  likes = 0,
+  comments = 0
+} = post;
+---
+
+<article class={`group flex flex-col bg-slate-50 rounded-3xl overflow-hidden transition-all duration-300 ${className}`}>
+  <!-- Image Section with Category Badge Overlay -->
+  <div class="relative aspect-[16/10] overflow-hidden">
+    <a href={`/blog/${post.slug}`} class="block w-full h-full cursor-pointer">
+      <img 
+        src={coverImage} 
+        alt={post.title} 
+        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        loading="lazy"
+      />
+    </a>
+    
+    <!-- Category Badge Overlay -->
+    <div class="absolute top-4 left-4">
+      <CategoryBadge 
+        name={category.name} 
+        color={category.color}
+        href={`/blog?category=${category.id}`}
+        className="shadow-lg backdrop-blur-sm bg-white/90"
+      />
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="p-5 flex flex-col">
+    <!-- Title -->
+    <h2 class="text-lg sm:text-xl font-semibold text-slate-900 leading-snug line-clamp-2 transition-colors duration-300 group-hover:text-blue-600 mb-2">
+      <a href={`/blog/${post.slug}`} class="cursor-pointer">
+        {post.title}
+      </a>
+    </h2>
+
+    <!-- Excerpt -->
+    <p class="text-sm text-slate-600 line-clamp-2 mb-3">
+      {excerpt}
+    </p>
+
+    <!-- Divider -->
+    <hr class="border-t border-slate-200 mb-3" />
+
+    <!-- Interaction Bar -->
+    <div class="flex items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <!-- Like Button -->
+        <button 
+          class="flex items-center gap-1 px-3 py-2 rounded-full bg-rose-50 text-rose-600 transition-colors duration-300 hover:bg-rose-100 cursor-pointer"
+          aria-label="Like article"
+        >
+          <Heart className="w-5 h-5 fill-current" />
+          <span class="text-xs font-medium">{likes.toLocaleString()}</span>
+        </button>
+
+        <!-- Comment Button -->
+        <button 
+          class="flex items-center gap-1 px-3 py-2 rounded-full bg-slate-50 text-slate-600 transition-colors duration-300 hover:bg-teal-50 hover:text-teal-600 cursor-pointer"
+          aria-label="View comments"
+        >
+          <MessageCircle className="w-[18px] h-[18px]" />
+          <span class="text-xs font-medium">{comments}</span>
+        </button>
+      </div>
+
+      <div class="flex items-center gap-2 text-xs text-slate-500">
+        <!-- Date -->
+        <time>{post.date}</time>
+        <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+        
+        <!-- Read Time -->
+        <span>{readTime}</span>
+
+        <!-- Bookmark Button -->
+        <button 
+          class="p-2 rounded-full transition-colors duration-300 hover:bg-slate-100 cursor-pointer"
+          aria-label="Bookmark article"
+        >
+          <Bookmark className="w-[18px] h-[18px] text-slate-600" />
+        </button>
+      </div>
+    </div>
+  </div>
+</article>
