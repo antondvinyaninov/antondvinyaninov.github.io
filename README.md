@@ -1,43 +1,158 @@
-# Astro Starter Kit: Minimal
+# 📰 Современный блог на Astro
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Современный блог с адаптивным дизайном, построенный на Astro, React и Tailwind CSS.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+🌐 **Live Demo:** [https://antondvinyaninov.github.io/](https://antondvinyaninov.github.io/)
 
-## 🚀 Project Structure
+## ✨ Возможности
 
-Inside of your Astro project, you'll see the following folders and files:
+- 🎨 Современный и чистый дизайн
+- 📱 Полностью адаптивная верстка
+- 🚀 Быстрая загрузка благодаря Astro
+- 📝 Блок "Последние статьи" с featured и компактными карточками
+- 🎥 Секция "Видео и подкасты"
+- 📧 Форма подписки на новости
+- 💬 Лайки и комментарии на статьях
+- 🏷️ Категории статей с цветными бейджами
+- 🔖 Функция закладок
+- ⚡ Автоматический деплой на GitHub Pages
+
+## 🚀 Структура проекта
 
 ```text
 /
 ├── public/
+│   └── images/              # Изображения статей и иллюстрации
 ├── src/
-│   └── pages/
-│       └── index.astro
+│   ├── components/          # Компоненты Astro и React
+│   │   ├── FeaturedArticleCard.astro
+│   │   ├── CompactArticleCard.astro
+│   │   ├── VideoCard.astro
+│   │   ├── Newsletter.astro
+│   │   └── ...
+│   ├── data/
+│   │   ├── posts.ts         # Данные статей
+│   │   └── authors.ts       # Данные авторов
+│   ├── layouts/
+│   │   └── BaseLayout.astro # Базовый layout
+│   ├── pages/
+│   │   └── index.astro      # Главная страница
+│   └── styles/
+│       └── global.css       # Глобальные стили
+├── .github/
+│   └── workflows/
+│       └── deploy.yml       # GitHub Actions для деплоя
 └── package.json
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 🛠️ Команды
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
+| Команда | Действие |
 | :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+| `npm install` | Установка зависимостей |
+| `npm run dev` | Запуск dev сервера на `localhost:4321` |
+| `npm run build` | Сборка production версии в `./dist/` |
+| `npm run preview` | Предварительный просмотр production сборки |
 
-## 👀 Want to learn more?
+## 📝 Как редактировать контент
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+### Добавление/редактирование статей
+
+Откройте файл `src/data/posts.ts` и добавьте новую статью:
+
+```typescript
+{
+    id: '11',
+    title: 'Заголовок вашей статьи',
+    slug: 'your-article-slug',
+    excerpt: 'Краткое описание статьи...',
+    category: { 
+        id: 'tech', 
+        name: 'Technology', 
+        color: 'bg-blue-100 text-blue-800'
+    },
+    author: AUTHORS[0],
+    date: 'Dec 11, 2024',
+    readTime: '5 min read',
+    views: 1000,
+    type: 'standard',  // или 'video' для видео
+    coverImage: '/images/your-image.jpg',
+    likes: 2500,
+    comments: 45,
+}
+```
+
+### Добавление изображений
+
+1. Поместите изображения в папку `public/images/`
+2. Используйте путь `/images/your-image.jpg` в поле `coverImage`
+
+### Доступные цвета категорий
+
+- `bg-blue-100 text-blue-800` - синий
+- `bg-green-100 text-green-800` - зеленый
+- `bg-red-100 text-red-800` - красный
+- `bg-yellow-100 text-yellow-800` - желтый
+- `bg-purple-100 text-purple-800` - фиолетовый
+- `bg-orange-100 text-orange-800` - оранжевый
+
+### Типы постов
+
+- `type: 'standard'` - обычная статья
+- `type: 'video'` - видео (отображается в блоке "Видео и подкасты")
+
+### Редактирование автора
+
+Откройте `src/data/authors.ts` и измените данные:
+
+```typescript
+{
+    id: '1',
+    name: 'Ваше имя',
+    avatar: '/images/your-avatar.jpg',
+    bio: 'Ваше описание',
+    postCount: 10
+}
+```
+
+## 🚀 Деплой
+
+Проект настроен для автоматического деплоя на GitHub Pages.
+
+### При каждом изменении:
+
+```bash
+git add .
+git commit -m "Описание изменений"
+git push origin2
+```
+
+Сайт автоматически обновится через 1-2 минуты!
+
+### Проверка статуса деплоя:
+
+```bash
+gh run list --repo antondvinyaninov/antondvinyaninov.github.io --limit 1
+```
+
+Или перейдите во вкладку **Actions** на GitHub.
+
+## 🎨 Технологии
+
+- [Astro](https://astro.build/) - Фреймворк для статических сайтов
+- [React](https://react.dev/) - Для интерактивных компонентов
+- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS фреймворк
+- [Lucide React](https://lucide.dev/) - Иконки
+- [GitHub Pages](https://pages.github.com/) - Хостинг
+
+## 📦 Версии
+
+См. [CHANGELOG.md](CHANGELOG.md) для истории изменений.
+
+## 📄 Лицензия
+
+MIT
+
+## 🤝 Контакты
+
+GitHub: [@antondvinyaninov](https://github.com/antondvinyaninov)

@@ -1,7 +1,14 @@
 {
-  "name": "test_google",
+  "name": "modern-blog",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "description": "Современный блог на Astro с адаптивным дизайном",
+  "author": "Anton Dvinyaninov",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/antondvinyaninov/antondvinyaninov.github.io.git"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
