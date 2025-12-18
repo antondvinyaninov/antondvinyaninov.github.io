@@ -19,19 +19,17 @@ export const GET: APIRoute = async () => {
       return getLocalImages();
     }
 
-    // Получаем URLs для всех изображений
+    // Получаем URLs для всех изображений через наш прокси
     const images = storageFiles.map((file) => {
-      // Формируем правильный public URL
-      // Формат: {SUPABASE_URL}/storage/v1/object/public/{bucket}/{filename}
-      const supabaseUrl = process.env.SUPABASE_URL || 'https://baze-supabase.crv1ic.easypanel.host';
-      const publicUrl = `${supabaseUrl}/storage/v1/object/public/blog-images/${file.name}`;
+      // Используем наш API прокси для обхода CORS проблем
+      const proxyUrl = `/api/image/${file.name}`;
       
       console.log('📸 Image:', file.name);
-      console.log('🔗 URL:', publicUrl);
+      console.log('🔗 Proxy URL:', proxyUrl);
 
       return {
         name: file.name,
-        url: publicUrl,
+        url: proxyUrl,
         size: file.metadata?.size || 0,
         modified: file.created_at
       };

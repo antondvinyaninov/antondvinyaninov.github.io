@@ -98,17 +98,15 @@ export const POST: APIRoute = async ({ request }) => {
 
     console.log('✅ Upload response:', data);
 
-    // Получаем публичный URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('blog-images')
-      .getPublicUrl(fileName);
+    // Используем наш прокси URL вместо прямого Supabase URL
+    const proxyUrl = `/api/image/${fileName}`;
 
     console.log('✅ Image uploaded:', fileName);
-    console.log('✅ Public URL:', publicUrl);
+    console.log('✅ Proxy URL:', proxyUrl);
 
     return new Response(JSON.stringify({ 
       success: true, 
-      url: publicUrl,
+      url: proxyUrl,
       fileName: fileName,
       size: optimizedBuffer.length,
       originalSize: buffer.length,
