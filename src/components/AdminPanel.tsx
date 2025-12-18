@@ -13,6 +13,7 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
   const [loading, setLoading] = useState(true);
   const [images, setImages] = useState<any[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Загружаем посты при монтировании
@@ -356,6 +357,17 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
                       </button>
                     </div>
                   </div>
+
+                  {/* Уведомление о загрузке */}
+                  {uploadMessage && (
+                    <div className={`p-4 rounded-lg border ${
+                      uploadMessage.type === 'success' 
+                        ? 'bg-green-50 border-green-200 text-green-800' 
+                        : 'bg-red-50 border-red-200 text-red-800'
+                    }`}>
+                      <p className="font-medium">{uploadMessage.text}</p>
+                    </div>
+                  )}
                   
                   {images.length === 0 ? (
                     <div className="text-center py-12 bg-slate-50 rounded-2xl">
