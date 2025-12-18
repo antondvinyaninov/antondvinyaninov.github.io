@@ -73,7 +73,7 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
       const formData = new FormData();
       formData.append('file', file);
 
-      const response = await fetch('/api/upload-image', {
+      const response = await fetch('/api/upload-local', {
         method: 'POST',
         body: formData
       });
