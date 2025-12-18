@@ -98,11 +98,19 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Генерируем уникальное имя файла (сохраняем оригинальное расширение)
+    // Генерируем безопасное имя файла (только латиница, цифры, дефисы)
     const timestamp = Date.now();
     const extension = file.name.split('.').pop() || 'jpg';
-    const originalName = file.name.replace(/\.[^/.]+$/, ''); // убираем расширение
-    const fileName = `${originalName}-${timestamp}.${extension}`;
+    // Транслитерация и очистка имени файла
+    const safeName = file.name
+      .replace(/\.[^/.]+$/, '') // убираем расширение
+      .toLowerCase()
+      .replace(/[а-яё]/g, '') // убираем кириллицу
+      .replace(/[^a-z0-9]/g, '-') // заменяем все кроме латиницы и цифр на дефис
+      .replace(/-+/g, '-') // убираем повторяющиеся дефисы
+      .replace(/^-|-$/g, ''); // убираем дефисы в начале и конце
+    
+    const fileName = `${safeName || 'image'}-${timestamp}.${extension}`;
 
     // Проверяем подключение к Supabase
     console.log('Supabase URL:', process.env.SUPABASE_URL);

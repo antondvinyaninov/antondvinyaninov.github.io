@@ -8,9 +8,10 @@ export const GET: APIRoute = async () => {
     // Тест 1: Проверка подключения
     tests.push({
       test: 'Connection',
-      supabaseUrl: process.env.SUPABASE_URL,
-      hasAnonKey: !!process.env.SUPABASE_ANON_KEY,
-      hasServiceKey: !!process.env.SUPABASE_SERVICE_KEY
+      supabaseUrl: import.meta.env.SUPABASE_URL || process.env.SUPABASE_URL,
+      hasAnonKey: !!(import.meta.env.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY),
+      hasServiceKey: !!(import.meta.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_KEY),
+      anonKeyLength: (import.meta.env.SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '').length
     });
 
     // Тест 2: Список buckets
