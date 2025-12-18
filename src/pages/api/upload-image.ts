@@ -43,6 +43,16 @@ export const POST: APIRoute = async ({ request }) => {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
+    console.log('📦 Original file:', {
+      name: file.name,
+      type: file.type,
+      size: buffer.length
+    });
+
+    // ВРЕМЕННО: загружаем без оптимизации для теста
+    const optimizedBuffer = buffer;
+    
+    /* ОТКЛЮЧЕНО ДЛЯ ТЕСТА
     // Оптимизируем изображение с правильными настройками
     let optimizedBuffer;
     try {
@@ -66,7 +76,6 @@ export const POST: APIRoute = async ({ request }) => {
         .webp({ 
           quality: 85,
           effort: 4,
-          // Не используем smartSubsample - может вызывать проблемы
         })
         .toBuffer();
 
@@ -76,6 +85,7 @@ export const POST: APIRoute = async ({ request }) => {
       // Если оптимизация не удалась, используем оригинал
       optimizedBuffer = buffer;
     }
+    */
 
     // Проверка размера после оптимизации (макс 5MB для Supabase)
     if (optimizedBuffer.length > 5 * 1024 * 1024) {
@@ -88,20 +98,21 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    // Генерируем уникальное имя файла
+    // Генерируем уникальное имя файла (сохраняем оригинальное расширение)
     const timestamp = Date.now();
+    const extension = file.name.split('.').pop() || 'jpg';
     const originalName = file.name.replace(/\.[^/.]+$/, ''); // убираем расширение
-    const fileName = `${originalName}-${timestamp}.webp`;
+    const fileName = `${originalName}-${timestamp}.${extension}`;
 
     // Проверяем подключение к Supabase
     console.log('Supabase URL:', process.env.SUPABASE_URL);
     console.log('Supabase Key exists:', !!process.env.SUPABASE_ANON_KEY);
 
-    // Загружаем в Supabase Storage
+    // Загружаем в Supabase Storage (используем оригинальный content-type)
     const { data, error } = await supabase.storage
       .from('blog-images')
       .upload(fileName, optimizedBuffer, {
-        contentType: 'image/webp',
+        contentType: file.type,
         cacheControl: '31536000', // 1 год
         upsert: false
       });
