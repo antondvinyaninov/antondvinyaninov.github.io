@@ -72,6 +72,10 @@ export const POST: APIRoute = async ({ request }) => {
     const originalName = file.name.replace(/\.[^/.]+$/, ''); // убираем расширение
     const fileName = `${originalName}-${timestamp}.webp`;
 
+    // Проверяем подключение к Supabase
+    console.log('Supabase URL:', process.env.SUPABASE_URL);
+    console.log('Supabase Key exists:', !!process.env.SUPABASE_ANON_KEY);
+
     // Загружаем в Supabase Storage
     const { data, error } = await supabase.storage
       .from('blog-images')
@@ -85,12 +89,14 @@ export const POST: APIRoute = async ({ request }) => {
       console.error('Supabase upload error:', error);
       return new Response(JSON.stringify({ 
         success: false, 
-        message: error.message 
+        message: `Upload failed: ${error.message}` 
       }), { 
         status: 500,
         headers: { 'Content-Type': 'application/json' }
       });
     }
+
+    console.log('✅ Upload response:', data);
 
     // Получаем публичный URL
     const { data: { publicUrl } } = supabase.storage
@@ -98,6 +104,7 @@ export const POST: APIRoute = async ({ request }) => {
       .getPublicUrl(fileName);
 
     console.log('✅ Image uploaded:', fileName);
+    console.log('✅ Public URL:', publicUrl);
 
     return new Response(JSON.stringify({ 
       success: true, 
