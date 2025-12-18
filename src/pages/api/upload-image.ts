@@ -43,18 +43,39 @@ export const POST: APIRoute = async ({ request }) => {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Оптимизируем изображение (более агрессивное сжатие)
-    const optimizedBuffer = await sharp(buffer)
-      .resize(1920, null, { 
-        withoutEnlargement: true,
-        fit: 'inside'
-      })
-      .webp({ 
-        quality: 80,
-        effort: 6,
-        smartSubsample: true
-      })
-      .toBuffer();
+    // Оптимизируем изображение с правильными настройками
+    let optimizedBuffer;
+    try {
+      const image = sharp(buffer);
+      const metadata = await image.metadata();
+      
+      console.log('📊 Original image:', {
+        format: metadata.format,
+        width: metadata.width,
+        height: metadata.height,
+        space: metadata.space,
+        channels: metadata.channels,
+        hasAlpha: metadata.hasAlpha
+      });
+
+      optimizedBuffer = await sharp(buffer)
+        .resize(1920, null, { 
+          withoutEnlargement: true,
+          fit: 'inside'
+        })
+        .webp({ 
+          quality: 85,
+          effort: 4,
+          // Не используем smartSubsample - может вызывать проблемы
+        })
+        .toBuffer();
+
+      console.log('✅ Optimized size:', optimizedBuffer.length);
+    } catch (sharpError) {
+      console.error('Sharp optimization error:', sharpError);
+      // Если оптимизация не удалась, используем оригинал
+      optimizedBuffer = buffer;
+    }
 
     // Проверка размера после оптимизации (макс 5MB для Supabase)
     if (optimizedBuffer.length > 5 * 1024 * 1024) {
