@@ -40,7 +40,10 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
   const loadImages = () => {
     fetch('/api/media.json')
       .then(res => res.json())
-      .then(data => setImages(data))
+      .then(data => {
+        console.log('Loaded images:', data);
+        setImages(data);
+      })
       .catch(err => console.error('Failed to load images:', err));
   };
 
@@ -394,14 +397,29 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {images.map((img, idx) => (
                         <div key={idx} className="group relative aspect-square rounded-lg overflow-hidden border border-slate-200 hover:border-slate-400 transition-colors cursor-pointer">
-                          <img src={img.url} alt={img.name} className="w-full h-full object-cover" />
+                          <img 
+                            src={img.url} 
+                            alt={img.name} 
+                            className="w-full h-full object-cover bg-slate-100"
+                            onError={(e) => {
+                              console.error('Image load error:', img.url);
+                              e.currentTarget.src = '/images/placeholder.png';
+                            }}
+                            onLoad={() => console.log('Image loaded:', img.url)}
+                          />
                           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-center justify-center">
-                            <button className="opacity-0 group-hover:opacity-100 px-3 py-1 bg-white text-slate-900 rounded text-sm font-medium">
+                            <button 
+                              onClick={() => {
+                                navigator.clipboard.writeText(img.url);
+                                alert('URL скопирован!');
+                              }}
+                              className="opacity-0 group-hover:opacity-100 px-3 py-1 bg-white text-slate-900 rounded text-sm font-medium"
+                            >
                               Копировать URL
                             </button>
                           </div>
                           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
-                            <p className="text-white text-xs truncate">{img.name}</p>
+                            <p className="text-white text-xs truncate" title={img.url}>{img.name}</p>
                           </div>
                         </div>
                       ))}
