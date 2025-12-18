@@ -4,7 +4,7 @@ WORKDIR /app
 # Install dependencies
 FROM base AS deps
 COPY package*.json ./
-RUN npm install --legacy-peer-deps
+RUN npm install
 
 # Build the app
 FROM base AS builder
