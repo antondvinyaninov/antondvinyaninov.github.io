@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { LayoutDashboard, FileText, Newspaper, BarChart3, Search, Settings, Edit, Image } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { LayoutDashboard, FileText, Newspaper, BarChart3, Search, Settings, Edit, Image, Upload } from 'lucide-react';
 import PostEditor from './PostEditor';
 import type { Post } from '../consts';
 
@@ -11,6 +11,9 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [images, setImages] = useState<any[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Загружаем посты при монтировании
   useEffect(() => {
@@ -25,6 +28,54 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
         setLoading(false);
       });
   }, []);
+
+  // Загружаем изображения для медиа вкладки
+  useEffect(() => {
+    if (activeTab === 'media') {
+      loadImages();
+    }
+  }, [activeTab]);
+
+  const loadImages = () => {
+    fetch('/api/media.json')
+      .then(res => res.json())
+      .then(data => setImages(data))
+      .catch(err => console.error('Failed to load images:', err));
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/upload-image', {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert(`✅ Изображение загружено!\nРазмер: ${Math.round(result.size / 1024)}KB\nЭкономия: ${result.savings}%`);
+        loadImages(); // Перезагружаем список
+      } else {
+        alert(`❌ Ошибка: ${result.message}`);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('❌ Ошибка при загрузке изображения');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
 
   const handleSavePost = async (updatedPost: Post) => {
     // Обновляем пост в локальном состоянии
@@ -278,33 +329,51 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-bold text-slate-900">Медиа библиотека</h2>
-                    <button className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors text-sm font-medium">
-                      + Загрузить изображение
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        className="hidden"
+                      />
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium disabled:opacity-50"
+                      >
+                        <Upload size={18} />
+                        {uploading ? 'Загрузка...' : 'Загрузить изображение'}
+                      </button>
+                    </div>
                   </div>
                   
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {/* Пример изображений из public/images */}
-                    {[
-                      '/images/hero_pool.png',
-                      '/images/hero_pool.jpg',
-                      '/images/post_interior.png',
-                      '/images/newsletter-illustration.png'
-                    ].map((img, idx) => (
-                      <div key={idx} className="group relative aspect-square rounded-lg overflow-hidden border border-slate-200 hover:border-slate-400 transition-colors cursor-pointer">
-                        <img src={img} alt="" className="w-full h-full object-cover" />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-center justify-center">
-                          <button className="opacity-0 group-hover:opacity-100 px-3 py-1 bg-white text-slate-900 rounded text-sm font-medium">
-                            Выбрать
-                          </button>
+                  {images.length === 0 ? (
+                    <div className="text-center py-12 bg-slate-50 rounded-2xl">
+                      <p className="text-slate-500 mb-2">Нет изображений в Supabase Storage</p>
+                      <p className="text-sm text-slate-400">Загрузите первое изображение</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {images.map((img, idx) => (
+                        <div key={idx} className="group relative aspect-square rounded-lg overflow-hidden border border-slate-200 hover:border-slate-400 transition-colors cursor-pointer">
+                          <img src={img.url} alt={img.name} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-center justify-center">
+                            <button className="opacity-0 group-hover:opacity-100 px-3 py-1 bg-white text-slate-900 rounded text-sm font-medium">
+                              Копировать URL
+                            </button>
+                          </div>
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
+                            <p className="text-white text-xs truncate">{img.name}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
                   
-                  <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-                    <p className="text-amber-800 text-sm">
-                      <strong>Примечание:</strong> Изображения хранятся в папке public/images/
+                  <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
+                    <p className="text-blue-800 text-sm">
+                      <strong>✨ Автоматическая оптимизация:</strong> Все изображения конвертируются в WebP и сжимаются на 70-90%
                     </p>
                   </div>
                 </div>
