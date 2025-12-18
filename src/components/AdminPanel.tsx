@@ -37,14 +37,17 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
     }
   }, [activeTab]);
 
-  const loadImages = () => {
-    fetch('/api/media.json')
-      .then(res => res.json())
-      .then(data => {
-        console.log('Loaded images:', data);
-        setImages(data);
-      })
-      .catch(err => console.error('Failed to load images:', err));
+  const loadImages = async () => {
+    try {
+      console.log('🔄 Loading images from API...');
+      const response = await fetch('/api/media.json');
+      const data = await response.json();
+      console.log('✅ Loaded images:', data);
+      console.log('📊 Number of images:', data.length);
+      setImages(data);
+    } catch (err) {
+      console.error('❌ Failed to load images:', err);
+    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,7 +85,13 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
           type: 'success',
           text: `✅ Изображение загружено! Размер: ${Math.round(result.size / 1024)}KB | Экономия: ${result.savings}%`
         });
-        loadImages(); // Перезагружаем список
+        
+        // Даем время Supabase обработать файл, затем перезагружаем список
+        console.log('⏳ Waiting for Supabase to process file...');
+        setTimeout(async () => {
+          await loadImages();
+          console.log('✅ Images reloaded after upload');
+        }, 1000);
         
         // Скрываем сообщение через 5 секунд
         setTimeout(() => setUploadMessage(null), 5000);
@@ -396,22 +405,40 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
                   ) : (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {images.map((img, idx) => (
-                        <div key={idx} className="group relative aspect-square rounded-lg overflow-hidden border border-slate-200 hover:border-slate-400 transition-colors cursor-pointer">
+                        <div key={`${img.name}-${idx}`} className="group relative aspect-square rounded-lg overflow-hidden border border-slate-200 hover:border-slate-400 transition-colors cursor-pointer bg-slate-100">
                           <img 
                             src={img.url} 
                             alt={img.name} 
-                            className="w-full h-full object-cover bg-slate-100"
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            crossOrigin="anonymous"
                             onError={(e) => {
-                              console.error('Image load error:', img.url);
-                              e.currentTarget.src = '/images/placeholder.png';
+                              console.error('❌ Image load error:', img.url);
+                              console.error('Image details:', img);
+                              e.currentTarget.style.display = 'none';
+                              const parent = e.currentTarget.parentElement;
+                              if (parent) {
+                                const errorDiv = document.createElement('div');
+                                errorDiv.className = 'absolute inset-0 flex items-center justify-center bg-red-50 text-red-600 text-xs p-2 text-center';
+                                errorDiv.textContent = 'Ошибка загрузки';
+                                parent.appendChild(errorDiv);
+                              }
                             }}
-                            onLoad={() => console.log('Image loaded:', img.url)}
+                            onLoad={(e) => {
+                              console.log('✅ Image loaded successfully:', img.url);
+                              e.currentTarget.style.opacity = '1';
+                            }}
+                            style={{ opacity: 0, transition: 'opacity 0.3s' }}
                           />
                           <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity flex items-center justify-center">
                             <button 
                               onClick={() => {
                                 navigator.clipboard.writeText(img.url);
-                                alert('URL скопирован!');
+                                setUploadMessage({
+                                  type: 'success',
+                                  text: '✅ URL скопирован в буфер обмена!'
+                                });
+                                setTimeout(() => setUploadMessage(null), 2000);
                               }}
                               className="opacity-0 group-hover:opacity-100 px-3 py-1 bg-white text-slate-900 rounded text-sm font-medium"
                             >
@@ -420,6 +447,7 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
                           </div>
                           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-2">
                             <p className="text-white text-xs truncate" title={img.url}>{img.name}</p>
+                            <p className="text-white text-xs opacity-75">{Math.round(img.size / 1024)}KB</p>
                           </div>
                         </div>
                       ))}
