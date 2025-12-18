@@ -50,7 +50,10 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
 
     // Проверка размера (макс 10MB)
     if (file.size > 10 * 1024 * 1024) {
-      alert('❌ Файл слишком большой! Максимум 10MB');
+      setUploadMessage({
+        type: 'error',
+        text: '❌ Файл слишком большой! Максимум 10MB'
+      });
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -58,6 +61,7 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
     }
 
     setUploading(true);
+    setUploadMessage(null);
 
     try {
       const formData = new FormData();
@@ -71,14 +75,26 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
       const result = await response.json();
 
       if (result.success) {
-        alert(`✅ Изображение загружено!\nРазмер: ${Math.round(result.size / 1024)}KB\nЭкономия: ${result.savings}%`);
+        setUploadMessage({
+          type: 'success',
+          text: `✅ Изображение загружено! Размер: ${Math.round(result.size / 1024)}KB | Экономия: ${result.savings}%`
+        });
         loadImages(); // Перезагружаем список
+        
+        // Скрываем сообщение через 5 секунд
+        setTimeout(() => setUploadMessage(null), 5000);
       } else {
-        alert(`❌ Ошибка: ${result.message}`);
+        setUploadMessage({
+          type: 'error',
+          text: `❌ Ошибка: ${result.message}`
+        });
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert('❌ Ошибка при загрузке изображения');
+      setUploadMessage({
+        type: 'error',
+        text: '❌ Ошибка при загрузке изображения'
+      });
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
