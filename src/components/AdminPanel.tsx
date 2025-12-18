@@ -47,6 +47,15 @@ export default function AdminPanel({ activeTab = 'dashboard' }: AdminPanelProps)
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Проверка размера (макс 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('❌ Файл слишком большой! Максимум 10MB');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+
     setUploading(true);
 
     try {

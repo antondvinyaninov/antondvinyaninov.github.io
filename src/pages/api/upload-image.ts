@@ -28,21 +28,44 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
+    // Проверка размера (макс 10MB до оптимизации)
+    if (file.size > 10 * 1024 * 1024) {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        message: 'File too large. Maximum 10MB before optimization.' 
+      }), { 
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // Читаем файл
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Оптимизируем изображение
+    // Оптимизируем изображение (более агрессивное сжатие)
     const optimizedBuffer = await sharp(buffer)
       .resize(1920, null, { 
         withoutEnlargement: true,
         fit: 'inside'
       })
       .webp({ 
-        quality: 85,
-        effort: 6
+        quality: 80,
+        effort: 6,
+        smartSubsample: true
       })
       .toBuffer();
+
+    // Проверка размера после оптимизации (макс 5MB для Supabase)
+    if (optimizedBuffer.length > 5 * 1024 * 1024) {
+      return new Response(JSON.stringify({ 
+        success: false, 
+        message: 'Изображение слишком большое даже после оптимизации. Попробуйте меньшее изображение.' 
+      }), { 
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
 
     // Генерируем уникальное имя файла
     const timestamp = Date.now();

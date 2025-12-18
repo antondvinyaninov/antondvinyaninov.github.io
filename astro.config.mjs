@@ -48,7 +48,11 @@ export default defineConfig({
   },
   
   server: {
-    port: 4321
+    port: 4321,
+    // Увеличиваем лимит для загрузки файлов
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    }
   },
   
   compressHTML: true,
