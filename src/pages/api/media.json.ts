@@ -19,10 +19,15 @@ export const GET: APIRoute = async () => {
       return getLocalImages();
     }
 
-    const images = storageFiles.map(file => {
-      const { data: { publicUrl } } = supabase.storage
-        .from('blog-images')
-        .getPublicUrl(file.name);
+    // Получаем URLs для всех изображений
+    const images = storageFiles.map((file) => {
+      // Формируем правильный public URL
+      // Формат: {SUPABASE_URL}/storage/v1/object/public/{bucket}/{filename}
+      const supabaseUrl = process.env.SUPABASE_URL || 'https://baze-supabase.crv1ic.easypanel.host';
+      const publicUrl = `${supabaseUrl}/storage/v1/object/public/blog-images/${file.name}`;
+      
+      console.log('📸 Image:', file.name);
+      console.log('🔗 URL:', publicUrl);
 
       return {
         name: file.name,
